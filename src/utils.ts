@@ -1,4 +1,6 @@
 import * as path from 'path';
+import * as os from 'os';
+import * as vscode from 'vscode';
 
 /**
  * Sanitizes the file name to use only letters, numbers, dots, hyphens, and underscores
@@ -23,7 +25,8 @@ export function validateUrlLength(url: string): boolean {
 export function getFileTypeFromPath(filePath: string): 'command' | 'rule' | 'prompt' | null {
   const normalizedPath = filePath.replace(/\\/g, '/');
   
-  if (normalizedPath.includes('/.cursor/commands/')) {
+  // Commands can be in either .cursor/commands/ or .claude/commands/
+  if (normalizedPath.includes('/.cursor/commands/') || normalizedPath.includes('/.claude/commands/')) {
     return 'command';
   }
   if (normalizedPath.includes('/.cursor/rules/')) {
@@ -79,5 +82,36 @@ export function getFileExtension(filePath: string): string {
  */
 export function getFileNameWithoutExtension(filePath: string): string {
   return path.parse(filePath).name;
+}
+
+/**
+ * Gets the user home directory path (cross-platform)
+ */
+export function getUserHomePath(): string {
+  return os.homedir();
+}
+
+/**
+ * Gets the commands folder name based on configuration ('cursor' or 'claude')
+ */
+export function getCommandsFolderName(): 'cursor' | 'claude' {
+  const config = vscode.workspace.getConfiguration('cursorDeeplink');
+  const folderName = config.get<string>('commandsFolder', 'cursor');
+  return folderName === 'claude' ? 'claude' : 'cursor';
+}
+
+/**
+ * Gets the full path to the commands folder
+ * @param workspacePath Optional workspace path (if not provided, returns user home path)
+ * @param isUser If true, returns path in user home directory; if false, returns workspace path
+ */
+export function getCommandsPath(workspacePath?: string, isUser: boolean = false): string {
+  const folderName = getCommandsFolderName();
+  
+  if (isUser || !workspacePath) {
+    return path.join(getUserHomePath(), `.${folderName}`, 'commands');
+  }
+  
+  return path.join(workspacePath, `.${folderName}`, 'commands');
 }
 

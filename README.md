@@ -17,11 +17,14 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
 
 ## Key Sharing Features
 
-  * **Generate Share Links**: Right-click on any file within `.cursor/` to generate the deeplink (command, rule, or prompt) **copied directly to your clipboard**.
+  * **Generate Share Links**: Right-click on any file within `.cursor/` or `.claude/commands/` to generate the deeplink (command, rule, or prompt) **copied directly to your clipboard**.
   * **Import for Replication**: Use the shortcut or command palette to instantly import a deeplink, **recreating the file for immediate use**.
+  * **User Commands Support**: Save commands to `~/.cursor/commands` or `~/.claude/commands` (personal commands available across all projects) or project-specific folders.
+  * **Claude Commands Compatibility**: Full support for `.claude/commands/` folder alongside `.cursor/commands/` - generate deeplinks and import commands to either folder based on configuration.
   * **Flexible Formats**: Choose between the native `cursor://` format or the `https://cursor.com/link/` web-redirect format.
   * **CodeLens for Quick Share**: Click the CodeLens link at the top of your file to quickly copy the share link.
   * **Size Validation**: Ensures your content fits within the 8,000 character URL limit after encoding, preventing sharing failures.
+  * **Organized Context Menu**: All Cursor Deeplink commands are organized in a submenu for better UX.
 
 ## Installation
 
@@ -46,7 +49,7 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
 #### Method 1: Context Menu (Recommended for Quick Generation)
 
 1.  Navigate to the configuration file you wish to share:
-      * `.cursor/commands/` (for Commands)
+      * `.cursor/commands/` or `.claude/commands/` (for Commands)
       * `.cursor/rules/` (for Rules)
       * `.cursor/prompts/` (for Prompts)
 2.  **Right-click** the file and select the specific **"Generate Cursor Deeplink..."** option (e.g., "Generate Cursor Deeplink Command").
@@ -54,7 +57,7 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
 
 #### Method 2: CodeLens (Direct In-File Access)
 
-1.  Open any file in `.cursor/commands/`, `.cursor/rules/`, or `.cursor/prompts/`.
+1.  Open any file in `.cursor/commands/`, `.claude/commands/`, `.cursor/rules/`, or `.cursor/prompts/`.
 2.  Click the CodeLens link displayed at the top of the file.
 3.  The deeplink will be generated and copied.
 
@@ -64,13 +67,26 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
 
 1.  Press **`Ctrl+Shift+I`** (Windows/Linux) or **`Cmd+Shift+I`** (Mac).
 2.  Paste the deeplink into the input box.
-3.  The file will be **automatically created and imported** into the appropriate directory.
+3.  For **commands**, choose where to save:
+    - **Project commands**: Save to `.cursor/commands/` or `.claude/commands/` in the current workspace (based on configuration, project-specific)
+    - **Personal commands**: Save to `~/.cursor/commands/` or `~/.claude/commands/` (based on configuration, available in all projects)
+4.  The file will be **automatically created and imported** into the appropriate directory.
 
 #### Method 2: Command Palette
 
 1.  Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux).
 2.  Type **"Import Cursor Deeplink"**.
-3.  Paste the deeplink, and the file will be created.
+3.  Paste the deeplink, and for commands, choose the save location.
+4.  The file will be created.
+
+### Saving Commands as User Commands
+
+You can move existing project commands to your personal commands folder so they're available across all projects:
+
+1.  Right-click on any file in `.cursor/commands/` or `.claude/commands/` folder.
+2.  Select **"Cursor Deeplink"** submenu.
+3.  Choose **"Save as User Command"**.
+4.  The command will be copied to `~/.cursor/commands/` or `~/.claude/commands/` (based on your configuration) and you'll be asked if you want to remove the original file from the workspace.
 
 ## 📐 Link Formats for Distribution
 
@@ -84,11 +100,12 @@ You can configure the extension to generate the format that best suits your dist
 
 ## Configuration
 
-Adjust settings to control the sharing format and allowed file types.
+Adjust settings to control the sharing format, allowed file types, and commands folder location.
 
   * **`cursorDeeplink.linkType`**: Defines whether to generate a `deeplink`, `web`, or `custom` link for sharing. (Default: `"deeplink"`)
   * **`cursorDeeplink.customBaseUrl`**: Custom base URL for deeplinks (only used when `linkType` is `"custom"`). Must be a valid URL starting with `http://`, `https://`, or a custom protocol. (Default: `""`)
   * **`cursorDeeplink.allowedExtensions`**: Allowed file extensions for link processing. (Default: `["md", "mdc"]`)
+  * **`cursorDeeplink.commandsFolder`**: Choose which folder to use for commands: `"cursor"` for `.cursor/commands/` or `"claude"` for `.claude/commands/`. Only affects the `commands` folder; `rules` and `prompts` always use `.cursor/`. Supports both workspace and user-level settings. (Default: `"cursor"`)
 
 ### Example Configurations
 
@@ -106,6 +123,15 @@ Adjust settings to control the sharing format and allowed file types.
   "cursorDeeplink.customBaseUrl": "https://example.com/link/"
 }
 ```
+
+#### Using Claude Commands Folder
+```json
+{
+  "cursorDeeplink.commandsFolder": "claude"
+}
+```
+
+This will make the extension save imported commands to `.claude/commands/` instead of `.cursor/commands/`. You can still generate deeplinks from both folders, but imports will go to the configured folder.
 
 ## Examples of Sharing in Action
 
@@ -132,7 +158,7 @@ Adjust settings to control the sharing format and allowed file types.
 ## Limitations (Relevant Sharing Information)
 
   * **Maximum URL Length**: The file content cannot exceed 8,000 characters (after URL-encoding) when converted into a link. The system will warn you if this limit is reached.
-  * **File Location**: Only files within the `.cursor/commands/`, `.cursor/rules/`, or `.cursor/prompts/` folders can be converted into share links.
+  * **File Location**: Only files within the `.cursor/commands/`, `.claude/commands/`, `.cursor/rules/`, or `.cursor/prompts/` folders can be converted into share links.
 
 ## Commands
 
@@ -140,7 +166,10 @@ Adjust settings to control the sharing format and allowed file types.
 | :--- | :--- | :--- |
 | `cursor-deeplink.generate` | Generate share link (opens type selector) | - |
 | `cursor-deeplink.generate-command` | Generate command share link | - |
+| `cursor-deeplink.generate-rule` | Generate rule share link | - |
+| `cursor-deeplink.generate-prompt` | Generate prompt share link | - |
 | `cursor-deeplink.import` | **Import** share link to create file | `Ctrl+Shift+I` / `Cmd+Shift+I` |
+| `cursor-deeplink.save-as-user-command` | Save project command as user command (available in all projects) | - |
 
 -----
 

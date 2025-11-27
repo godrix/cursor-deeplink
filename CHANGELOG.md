@@ -2,6 +2,29 @@
 
 All notable changes to the "Cursor Deeplink" extension will be documented in this file.
 
+## [0.3.0] - 2025-11-27
+
+### Added
+- **User Commands Support**: When importing commands, choose between saving as "Project commands" (workspace-specific) or "Personal commands" (saved to `~/.cursor/commands/` or `~/.claude/commands/` and available across all projects)
+- **Save as User Command**: New command to move existing project commands to personal commands folder via context menu
+- **Organized Context Menu**: All Cursor Deeplink commands are now organized in a submenu for better user experience
+- **Claude Commands Compatibility**: Support for `.claude/commands/` folder in addition to `.cursor/commands/`
+- **Configurable Commands Folder**: New `cursorDeeplink.commandsFolder` setting to choose between `cursor` (default) or `claude` for where to save imported commands
+- Context menu and CodeLens now work for both `.cursor/commands/` and `.claude/commands/` folders
+- Generate deeplinks from files in either `.cursor/commands/` or `.claude/commands/` folders
+
+### Changed
+- Import flow now prompts for command location (project vs personal) when importing command deeplinks
+- Context menu structure improved with submenu organization
+- Import flow now respects the `commandsFolder` configuration when saving imported commands
+- `save-as-user-command` command now uses the configured commands folder (workspace or user level)
+- Updated validation to accept both `.cursor/commands/` and `.claude/commands/` folders
+
+### Notes
+- Only the `commands` folder is configurable; `rules` and `prompts` continue to use `.cursor/` folder
+- Configuration supports both workspace and user-level settings
+- Default behavior remains `.cursor/commands/` for backward compatibility
+
 ## [0.2.0] - 2025-11-25
 
 ### Added

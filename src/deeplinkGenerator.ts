@@ -56,7 +56,7 @@ export async function generateDeeplink(
     } else {
       fileType = getFileTypeFromPath(filePath);
       if (!fileType) {
-        vscode.window.showErrorMessage('File must be in .cursor/commands/, .cursor/rules/ or .cursor/prompts/');
+        vscode.window.showErrorMessage('File must be in .cursor/commands/, .claude/commands/, .cursor/rules/ or .cursor/prompts/');
         return null;
       }
     }
