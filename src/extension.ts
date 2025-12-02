@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { generateDeeplink } from './deeplinkGenerator';
 import { importDeeplink } from './deeplinkImporter';
-import { getFileTypeFromPath, isAllowedExtension, getUserHomePath, getCommandsPath, getCommandsFolderName } from './utils';
+import { getFileTypeFromPath, isAllowedExtension, getUserHomePath, getCommandsPath, getCommandsFolderName, sanitizeFileName } from './utils';
 import { DeeplinkCodeLensProvider } from './codelensProvider';
+import { UserCommandsTreeProvider, CommandFileItem } from './userCommandsTreeProvider';
 
 /**
  * Helper function to generate deeplink with validations
@@ -224,6 +225,253 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // Register User Commands Tree Provider
+  const userCommandsTreeProvider = new UserCommandsTreeProvider();
+  const userCommandsTreeView = vscode.window.createTreeView('cursor-deeplink.userCommands', {
+    treeDataProvider: userCommandsTreeProvider,
+    showCollapseAll: false
+  });
+
+  /**
+   * Helper function to get URI from command argument (can be CommandFileItem or vscode.Uri)
+   */
+  function getUriFromArgument(arg: CommandFileItem | vscode.Uri | undefined): vscode.Uri | null {
+    if (!arg) {
+      return null;
+    }
+    if (arg instanceof vscode.Uri) {
+      return arg;
+    }
+    if ('uri' in arg) {
+      return arg.uri;
+    }
+    return null;
+  }
+
+  /**
+   * Helper function to get file name from command argument
+   */
+  function getFileNameFromArgument(arg: CommandFileItem | vscode.Uri | undefined): string {
+    if (!arg) {
+      return 'file';
+    }
+    if (arg instanceof vscode.Uri) {
+      return path.basename(arg.fsPath);
+    }
+    if ('fileName' in arg) {
+      return arg.fileName;
+    }
+    return 'file';
+  }
+
+  /**
+   * Helper function to get file path from command argument
+   */
+  function getFilePathFromArgument(arg: CommandFileItem | vscode.Uri | undefined): string | null {
+    if (!arg) {
+      return null;
+    }
+    if (arg instanceof vscode.Uri) {
+      return arg.fsPath;
+    }
+    if ('filePath' in arg) {
+      return arg.filePath;
+    }
+    return null;
+  }
+
+  // Command to open user command file
+  const openUserCommand = vscode.commands.registerCommand(
+    'cursor-deeplink.openUserCommand',
+    async (arg?: CommandFileItem | vscode.Uri) => {
+      const uri = getUriFromArgument(arg);
+      if (!uri) {
+        vscode.window.showErrorMessage('No file selected');
+        return;
+      }
+      try {
+        const document = await vscode.workspace.openTextDocument(uri);
+        await vscode.window.showTextDocument(document);
+      } catch (error) {
+        vscode.window.showErrorMessage(`Error opening file: ${error}`);
+      }
+    }
+  );
+
+  // Command to generate deeplink for user command
+  const generateUserCommandDeeplink = vscode.commands.registerCommand(
+    'cursor-deeplink.generateUserCommandDeeplink',
+    async (arg?: CommandFileItem | vscode.Uri) => {
+      const uri = getUriFromArgument(arg);
+      if (!uri) {
+        vscode.window.showErrorMessage('No file selected');
+        return;
+      }
+      await generateDeeplinkWithValidation(uri, 'command');
+    }
+  );
+
+  // Command to delete user command
+  const deleteUserCommand = vscode.commands.registerCommand(
+    'cursor-deeplink.deleteUserCommand',
+    async (arg?: CommandFileItem | vscode.Uri) => {
+      const uri = getUriFromArgument(arg);
+      if (!uri) {
+        vscode.window.showErrorMessage('No file selected');
+        return;
+      }
+      const fileName = getFileNameFromArgument(arg);
+      const confirm = await vscode.window.showWarningMessage(
+        `Are you sure you want to delete "${fileName}"?`,
+        'Yes',
+        'No'
+      );
+
+      if (confirm === 'Yes') {
+        try {
+          await vscode.workspace.fs.delete(uri);
+          vscode.window.showInformationMessage(`Command "${fileName}" deleted`);
+          userCommandsTreeProvider.refresh();
+        } catch (error) {
+          vscode.window.showErrorMessage(`Error deleting file: ${error}`);
+        }
+      }
+    }
+  );
+
+  // Command to reveal user command in explorer
+  const revealUserCommand = vscode.commands.registerCommand(
+    'cursor-deeplink.revealUserCommand',
+    async (arg?: CommandFileItem | vscode.Uri) => {
+      const uri = getUriFromArgument(arg);
+      if (!uri) {
+        vscode.window.showErrorMessage('No file selected');
+        return;
+      }
+      try {
+        await vscode.commands.executeCommand('revealInExplorer', uri);
+      } catch (error) {
+        vscode.window.showErrorMessage(`Error revealing file: ${error}`);
+      }
+    }
+  );
+
+  // Command to rename user command
+  const renameUserCommand = vscode.commands.registerCommand(
+    'cursor-deeplink.renameUserCommand',
+    async (arg?: CommandFileItem | vscode.Uri) => {
+      const uri = getUriFromArgument(arg);
+      if (!uri) {
+        vscode.window.showErrorMessage('No file selected');
+        return;
+      }
+      const currentFileName = getFileNameFromArgument(arg);
+      const currentFilePath = getFilePathFromArgument(arg);
+      
+      if (!currentFilePath) {
+        vscode.window.showErrorMessage('Unable to determine file path');
+        return;
+      }
+
+      const config = vscode.workspace.getConfiguration('cursorDeeplink');
+      const allowedExtensions = config.get<string[]>('allowedExtensions', ['md', 'mdc']);
+
+      const newName = await vscode.window.showInputBox({
+        prompt: 'Enter new file name',
+        value: currentFileName,
+        validateInput: (value) => {
+          if (!value || value.trim().length === 0) {
+            return 'File name cannot be empty';
+          }
+
+          // Check if extension is allowed
+          const ext = path.extname(value);
+          const extWithoutDot = ext.startsWith('.') ? ext.substring(1) : ext;
+          if (!allowedExtensions.includes(extWithoutDot.toLowerCase())) {
+            return `Extension must be one of: ${allowedExtensions.join(', ')}`;
+          }
+
+          // Sanitize and check if name is valid
+          const sanitized = sanitizeFileName(value);
+          if (sanitized !== path.parse(value).name) {
+            return 'File name contains invalid characters';
+          }
+
+          // Check if file already exists
+          const newPath = path.join(path.dirname(currentFilePath), value);
+          if (newPath === currentFilePath) {
+            return null; // Same name, no error
+          }
+
+          return null;
+        }
+      });
+
+      if (newName && newName !== currentFileName) {
+        try {
+          const newPath = path.join(path.dirname(currentFilePath), newName);
+          const newUri = vscode.Uri.file(newPath);
+
+          // Check if file already exists
+          try {
+            await vscode.workspace.fs.stat(newUri);
+            const overwrite = await vscode.window.showWarningMessage(
+              `File "${newName}" already exists. Do you want to overwrite it?`,
+              'Yes',
+              'No'
+            );
+            if (overwrite !== 'Yes') {
+              return;
+            }
+          } catch {
+            // File doesn't exist, that's fine
+          }
+
+          await vscode.workspace.fs.rename(uri, newUri, { overwrite: true });
+          vscode.window.showInformationMessage(`Command renamed to "${newName}"`);
+          userCommandsTreeProvider.refresh();
+        } catch (error) {
+          vscode.window.showErrorMessage(`Error renaming file: ${error}`);
+        }
+      }
+    }
+  );
+
+  // Command to refresh user commands tree
+  const refreshUserCommands = vscode.commands.registerCommand(
+    'cursor-deeplink.refreshUserCommands',
+    () => {
+      userCommandsTreeProvider.refresh();
+    }
+  );
+
+  // File system watcher to update tree when files change
+  const userCommandsPath = getCommandsPath(undefined, true);
+  const userCommandsFolderUri = vscode.Uri.file(userCommandsPath);
+  const userCommandsWatcher = vscode.workspace.createFileSystemWatcher(
+    new vscode.RelativePattern(userCommandsFolderUri, '**/*')
+  );
+
+  userCommandsWatcher.onDidCreate(() => {
+    userCommandsTreeProvider.refresh();
+  });
+
+  userCommandsWatcher.onDidDelete(() => {
+    userCommandsTreeProvider.refresh();
+  });
+
+  userCommandsWatcher.onDidChange(() => {
+    // Optionally refresh on file changes (not just create/delete)
+    // userCommandsTreeProvider.refresh();
+  });
+
+  // Watch for configuration changes
+  const configWatcher = vscode.workspace.onDidChangeConfiguration((e) => {
+    if (e.affectsConfiguration('cursorDeeplink.commandsFolder')) {
+      userCommandsTreeProvider.refresh();
+    }
+  });
+
   context.subscriptions.push(
     codeLensDisposable,
     generateCommand,
@@ -231,7 +479,16 @@ export function activate(context: vscode.ExtensionContext) {
     generateRuleSpecific,
     generatePromptSpecific,
     importCommand,
-    saveAsUserCommand
+    saveAsUserCommand,
+    userCommandsTreeView,
+    openUserCommand,
+    generateUserCommandDeeplink,
+    deleteUserCommand,
+    revealUserCommand,
+    renameUserCommand,
+    refreshUserCommands,
+    userCommandsWatcher,
+    configWatcher
   );
 }
 

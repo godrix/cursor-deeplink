@@ -2,6 +2,26 @@
 
 All notable changes to the "Cursor Deeplink" extension will be documented in this file.
 
+## [0.4.0] - 2025-12-02
+
+### Added
+- **Personal Commands Tree View**: New "Personal Commands" view in the Explorer sidebar to browse and manage user commands from `~/.cursor/commands/` or `~/.claude/commands/`
+- **User Commands Management**: New commands to manage personal commands directly from the tree view:
+  - Open command file
+  - Generate deeplink for command
+  - Rename command
+  - Delete command
+  - Reveal command in Explorer
+  - Refresh tree view
+- **AGENTS.md Documentation**: Added comprehensive development guide with coding conventions, architecture patterns, and best practices
+- Tree view automatically creates user commands folder if it doesn't exist
+- Tree view filters files by allowed extensions from configuration
+- Commands sorted alphabetically in tree view
+
+### Changed
+- Enhanced user commands management with visual tree view interface
+- Improved organization of personal commands with dedicated sidebar view
+
 ## [0.3.0] - 2025-11-27
 
 ### Added

@@ -2,7 +2,7 @@
   "name": "cursor-deeplink",
   "displayName": "Cursor Deeplink",
   "description": "Generate and import deeplinks for Cursor commands, rules, and prompts files",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "godrix",
   "icon": "resources/icon.png",
   "author": {
@@ -39,7 +39,8 @@
     "onCommand:cursor-deeplink.generate-rule",
     "onCommand:cursor-deeplink.generate-prompt",
     "onCommand:cursor-deeplink.import",
-    "onCommand:cursor-deeplink.save-as-user-command"
+    "onCommand:cursor-deeplink.save-as-user-command",
+    "onView:cursor-deeplink.userCommands"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -67,6 +68,32 @@
       {
         "command": "cursor-deeplink.save-as-user-command",
         "title": "Save as User Command"
+      },
+      {
+        "command": "cursor-deeplink.openUserCommand",
+        "title": "Open Command",
+        "icon": "$(file)"
+      },
+      {
+        "command": "cursor-deeplink.generateUserCommandDeeplink",
+        "title": "Generate Deeplink"
+      },
+      {
+        "command": "cursor-deeplink.deleteUserCommand",
+        "title": "Delete Command"
+      },
+      {
+        "command": "cursor-deeplink.revealUserCommand",
+        "title": "Reveal in Explorer"
+      },
+      {
+        "command": "cursor-deeplink.renameUserCommand",
+        "title": "Rename Command"
+      },
+      {
+        "command": "cursor-deeplink.refreshUserCommands",
+        "title": "Refresh",
+        "icon": "$(refresh)"
       }
     ],
     "submenus": [
@@ -75,12 +102,55 @@
         "label": "Cursor Deeplink"
       }
     ],
+    "views": {
+      "explorer": [
+        {
+          "id": "cursor-deeplink.userCommands",
+          "name": "Personal Commands",
+          "when": "true"
+        }
+      ]
+    },
     "menus": {
       "explorer/context": [
         {
           "submenu": "cursor-deeplink",
           "when": "resourcePath =~ /(\\.(cursor|claude)\\/(commands|rules|prompts)\\/)/",
           "group": "navigation"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "cursor-deeplink.refreshUserCommands",
+          "when": "view == cursor-deeplink.userCommands",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "cursor-deeplink.openUserCommand",
+          "when": "view == cursor-deeplink.userCommands && viewItem == userCommandFile",
+          "group": "inline"
+        },
+        {
+          "command": "cursor-deeplink.generateUserCommandDeeplink",
+          "when": "view == cursor-deeplink.userCommands && viewItem == userCommandFile",
+          "group": "1_actions"
+        },
+        {
+          "command": "cursor-deeplink.renameUserCommand",
+          "when": "view == cursor-deeplink.userCommands && viewItem == userCommandFile",
+          "group": "1_actions"
+        },
+        {
+          "command": "cursor-deeplink.revealUserCommand",
+          "when": "view == cursor-deeplink.userCommands && viewItem == userCommandFile",
+          "group": "1_actions"
+        },
+        {
+          "command": "cursor-deeplink.deleteUserCommand",
+          "when": "view == cursor-deeplink.userCommands && viewItem == userCommandFile",
+          "group": "2_actions"
         }
       ],
       "cursor-deeplink": [
