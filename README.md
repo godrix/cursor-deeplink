@@ -1,4 +1,4 @@
-# Cursor Deeplink Extension 🔗 Share Your Configurations
+# Cursor Commands Share Extension 🔗 Share Your Configurations
 
 A VS Code/Cursor extension designed to **simplify and accelerate the sharing** of your custom Cursor configurations (commands, rules, and prompts) through easy-to-generate and easy-to-import deeplinks.
 
@@ -15,6 +15,25 @@ This extension turns your Cursor configuration files into sharable assets, great
 
 Deeplinks are the ideal tool to ensure everyone on your team uses the exact same AI commands, rules, and prompts, promoting **consistency** and **knowledge sharing**.
 
+## ✨ What's New in v0.4.0
+
+### Personal Commands Management
+- **Tree View Interface**: New "Personal Commands" sidebar view to browse and manage your user commands from `~/.cursor/commands/` or `~/.claude/commands/`
+- **Visual Command Management**: Manage personal commands directly from the tree view with actions to:
+  - Open command files
+  - Generate deeplinks for sharing
+  - Rename commands
+  - Delete commands
+  - Reveal commands in Explorer
+  - Refresh the tree view
+- **Automatic Folder Creation**: Tree view automatically creates user commands folder if it doesn't exist
+- **Smart Filtering**: Tree view filters files by allowed extensions from configuration
+- **Alphabetical Sorting**: Commands are automatically sorted alphabetically for easy navigation
+
+### Enhanced User Experience
+- **Improved Organization**: Enhanced user commands management with visual tree view interface
+- **Better Accessibility**: Dedicated sidebar view for personal commands makes them easily accessible across all projects
+
 ## Key Sharing Features
 
   * **Generate Share Links**: Right-click on any file within `.cursor/` or `.claude/commands/` to generate the deeplink (command, rule, or prompt) **copied directly to your clipboard**.
@@ -24,7 +43,7 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
   * **Flexible Formats**: Choose between the native `cursor://` format or the `https://cursor.com/link/` web-redirect format.
   * **CodeLens for Quick Share**: Click the CodeLens link at the top of your file to quickly copy the share link.
   * **Size Validation**: Ensures your content fits within the 8,000 character URL limit after encoding, preventing sharing failures.
-  * **Organized Context Menu**: All Cursor Deeplink commands are organized in a submenu for better UX.
+  * **Organized Context Menu**: All Cursor Commands Share commands are organized in a submenu for better UX.
 
 ## Installation
 
@@ -32,7 +51,7 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
 
 - **VS Code Marketplace**: [Install from Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Godrix.cursor-deeplink)
 - **Open VSX (Cursor/other editors)**: [Install via Open VSX Registry](https://open-vsx.org/extension/godrix/cursor-deeplink)
-- **Cursor Store**: Search for "Cursor Deeplink" directly inside Cursor's extension store
+- **Cursor Store**: Search for "Cursor Commands Share" directly inside Cursor's extension store
 
 ### Manual Install via VSIX
 
@@ -52,7 +71,7 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
       * `.cursor/commands/` or `.claude/commands/` (for Commands)
       * `.cursor/rules/` (for Rules)
       * `.cursor/prompts/` (for Prompts)
-2.  **Right-click** the file and select the specific **"Generate Cursor Deeplink..."** option (e.g., "Generate Cursor Deeplink Command").
+2.  **Right-click** the file and select the specific **"Generate Cursor Commands Share..."** option (e.g., "Generate Cursor Commands Share Command").
 3.  The share link will be **automatically copied to your clipboard**.
 
 #### Method 2: CodeLens (Direct In-File Access)
@@ -75,7 +94,7 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
 #### Method 2: Command Palette
 
 1.  Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux).
-2.  Type **"Import Cursor Deeplink"**.
+2.  Type **"Import Cursor Commands Share"**.
 3.  Paste the deeplink, and for commands, choose the save location.
 4.  The file will be created.
 
@@ -84,7 +103,7 @@ Deeplinks are the ideal tool to ensure everyone on your team uses the exact same
 You can move existing project commands to your personal commands folder so they're available across all projects:
 
 1.  Right-click on any file in `.cursor/commands/` or `.claude/commands/` folder.
-2.  Select **"Cursor Deeplink"** submenu.
+2.  Select **"Cursor Commands Share"** submenu.
 3.  Choose **"Save as User Command"**.
 4.  The command will be copied to `~/.cursor/commands/` or `~/.claude/commands/` (based on your configuration) and you'll be asked if you want to remove the original file from the workspace.
 

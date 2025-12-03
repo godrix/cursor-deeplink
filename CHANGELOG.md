@@ -1,6 +1,13 @@
 # Change Log
 
-All notable changes to the "Cursor Deeplink" extension will be documented in this file.
+All notable changes to the "Cursor Commands Share" extension will be documented in this file.
+
+## [0.5.0] - 2025-12-02
+
+### Changed
+- **Extension Rebranding**: Renamed extension from "Cursor Deeplink" to "Cursor Commands Share" to better reflect its purpose of sharing and managing Cursor configurations
+- Updated all user-facing text, command titles, and documentation to reflect the new name
+- Maintained backward compatibility with existing command IDs and configuration keys
 
 ## [0.4.0] - 2025-12-02
 
@@ -27,7 +34,7 @@ All notable changes to the "Cursor Deeplink" extension will be documented in thi
 ### Added
 - **User Commands Support**: When importing commands, choose between saving as "Project commands" (workspace-specific) or "Personal commands" (saved to `~/.cursor/commands/` or `~/.claude/commands/` and available across all projects)
 - **Save as User Command**: New command to move existing project commands to personal commands folder via context menu
-- **Organized Context Menu**: All Cursor Deeplink commands are now organized in a submenu for better user experience
+- **Organized Context Menu**: All Cursor Commands Share commands are now organized in a submenu for better user experience
 - **Claude Commands Compatibility**: Support for `.claude/commands/` folder in addition to `.cursor/commands/`
 - **Configurable Commands Folder**: New `cursorDeeplink.commandsFolder` setting to choose between `cursor` (default) or `claude` for where to save imported commands
 - Context menu and CodeLens now work for both `.cursor/commands/` and `.claude/commands/` folders

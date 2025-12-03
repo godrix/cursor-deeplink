@@ -42,7 +42,58 @@ export class UserCommandsTreeProvider implements vscode.TreeDataProvider<Command
   }
 
   /**
-   * Gets the children of the tree (all command files in user folder)
+   * Recursively reads directory contents and finds all command files
+   * @param basePath The base commands folder path (e.g., ~/.cursor/commands/)
+   * @param currentPath The current directory being processed
+   * @param allowedExtensions Array of allowed file extensions
+   * @returns Array of CommandFileItem with relative paths in fileName
+   */
+  private async readDirectoryRecursive(
+    basePath: string,
+    currentPath: string,
+    allowedExtensions: string[]
+  ): Promise<CommandFileItem[]> {
+    const commandFiles: CommandFileItem[] = [];
+    const currentUri = vscode.Uri.file(currentPath);
+
+    try {
+      // Read directory contents
+      const entries = await vscode.workspace.fs.readDirectory(currentUri);
+
+      for (const [name, type] of entries) {
+        const itemPath = path.join(currentPath, name);
+
+        if (type === vscode.FileType.File) {
+          // Check if extension is allowed
+          if (isAllowedExtension(itemPath, allowedExtensions)) {
+            // Calculate relative path from basePath
+            const relativePath = path.relative(basePath, itemPath);
+            // Normalize path separators for cross-platform compatibility
+            const normalizedRelativePath = relativePath.replace(/\\/g, '/');
+            
+            const fileUri = vscode.Uri.file(itemPath);
+            commandFiles.push({
+              uri: fileUri,
+              fileName: normalizedRelativePath,
+              filePath: itemPath
+            });
+          }
+        } else if (type === vscode.FileType.Directory) {
+          // Recursively search in subdirectories
+          const subFiles = await this.readDirectoryRecursive(basePath, itemPath, allowedExtensions);
+          commandFiles.push(...subFiles);
+        }
+      }
+    } catch (error) {
+      // Handle errors (permission denied, etc.) silently for subdirectories
+      console.error(`Error reading directory ${currentPath}:`, error);
+    }
+
+    return commandFiles;
+  }
+
+  /**
+   * Gets the children of the tree (all command files in user folder, including subfolders)
    */
   async getChildren(element?: CommandFileItem): Promise<CommandFileItem[]> {
     // This is a flat tree, so no children for individual items
@@ -64,32 +115,18 @@ export class UserCommandsTreeProvider implements vscode.TreeDataProvider<Command
         return [];
       }
 
-      // Read directory contents
-      const entries = await vscode.workspace.fs.readDirectory(folderUri);
-
       // Get allowed extensions from configuration
       const config = vscode.workspace.getConfiguration('cursorDeeplink');
       const allowedExtensions = config.get<string[]>('allowedExtensions', ['md', 'mdc']);
 
-      // Filter files by allowed extensions
-      const commandFiles: CommandFileItem[] = [];
-      for (const [name, type] of entries) {
-        // Only include files (not directories)
-        if (type === vscode.FileType.File) {
-          const filePath = path.join(userCommandsPath, name);
-          // Check if extension is allowed
-          if (isAllowedExtension(filePath, allowedExtensions)) {
-            const fileUri = vscode.Uri.file(filePath);
-            commandFiles.push({
-              uri: fileUri,
-              fileName: name,
-              filePath: filePath
-            });
-          }
-        }
-      }
+      // Recursively read all command files
+      const commandFiles = await this.readDirectoryRecursive(
+        userCommandsPath,
+        userCommandsPath,
+        allowedExtensions
+      );
 
-      // Sort files alphabetically
+      // Sort files alphabetically by relative path
       commandFiles.sort((a, b) => a.fileName.localeCompare(b.fileName));
 
       return commandFiles;

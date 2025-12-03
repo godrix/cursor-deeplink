@@ -1,8 +1,8 @@
 {
   "name": "cursor-deeplink",
-  "displayName": "Cursor Deeplink",
+  "displayName": "Cursor Commands Share",
   "description": "Generate and import deeplinks for Cursor commands, rules, and prompts files",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "publisher": "godrix",
   "icon": "resources/icon.png",
   "author": {
@@ -47,23 +47,23 @@
     "commands": [
       {
         "command": "cursor-deeplink.generate",
-        "title": "Generate Cursor Deeplink"
+        "title": "Generate Cursor Commands Share"
       },
       {
         "command": "cursor-deeplink.generate-command",
-        "title": "Generate Cursor Deeplink Command"
+        "title": "Generate Cursor Commands Share Command"
       },
       {
         "command": "cursor-deeplink.generate-rule",
-        "title": "Generate Cursor Deeplink Rule"
+        "title": "Generate Cursor Commands Share Rule"
       },
       {
         "command": "cursor-deeplink.generate-prompt",
-        "title": "Generate Cursor Deeplink Prompt"
+        "title": "Generate Cursor Commands Share Prompt"
       },
       {
         "command": "cursor-deeplink.import",
-        "title": "Import Cursor Deeplink"
+        "title": "Import Cursor Commands Share"
       },
       {
         "command": "cursor-deeplink.save-as-user-command",
@@ -99,7 +99,7 @@
     "submenus": [
       {
         "id": "cursor-deeplink",
-        "label": "Cursor Deeplink"
+        "label": "Cursor Commands Share"
       }
     ],
     "views": {
@@ -177,7 +177,7 @@
       ]
     },
     "configuration": {
-      "title": "Cursor Deeplink",
+      "title": "Cursor Commands Share",
       "properties": {
         "cursorDeeplink.linkType": {
           "type": "string",
