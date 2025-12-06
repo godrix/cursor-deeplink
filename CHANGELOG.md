@@ -2,23 +2,30 @@
 
 All notable changes to the "Cursor Toys" extension will be documented in this file.
 
-## [0.6.0] - 2025-01-XX
+## [0.6.0] - 2025-12-06
 
 ### Added
 - **Chat Integration**: New commands to send code and text directly to Cursor chat
   - `cursor-toys.sendToChat`: Send custom text to Cursor chat
   - `cursor-toys.sendSelectionToChat`: Send selected code to Cursor chat with context
+  - `cursor-toys.copySelectionAsPrompt`: Copy selected code as prompt deeplink with file context
 - **Annotation Panel**: New Webview Panel that opens via deeplinks (similar to Datadog extension)
-  - Opens via `cursor://godrix.cursor-deeplink/annotation?...` deeplinks
+  - Opens via `cursor://godrix.cursor-deeplink/annotation?...` or `vscode://godrix.cursor-deeplink/annotation?...` deeplinks
   - Displays code, errors, and context in a formatted view
   - "Fix in Chat" button to send content directly to Cursor chat
 - **URI Handler**: Registered custom protocol handler for `cursor://godrix.cursor-deeplink/*` and `vscode://godrix.cursor-deeplink/*`
-- **Context Menu Integration**: Right-click on selected code to send to chat
+- **Editor Context Menu**: New submenu "Cursor Toys" when text is selected with options:
+  - Send Selection to Chat
+  - Copy as Prompt Deeplink (includes file path, language, and line numbers in context)
+- **Context Information**: Copy command now includes file context (relative path, language, line numbers) when copying code as prompt deeplink
 
 ### Changed
 - **Extension Rebranding**: Renamed extension from "Cursor Commands Share" to "Cursor Sidekick", and later to "Cursor Toys"
-- Updated all user-facing text, command titles, and documentation to reflect the new name
-- Maintained backward compatibility with existing command IDs and configuration keys
+- **Command IDs**: All command IDs updated from `cursor-sidekick.*` to `cursor-toys.*` for consistency
+- Updated all user-facing text, command titles, and documentation to reflect the new name "Cursor Toys"
+- Removed "Send to Chat" command from Command Palette (now only available via context menu)
+- CodeLens labels updated to show "Generate Cursor Toys" instead of "Generate Cursor Sidekick"
+- Annotation Panel titles updated to "Cursor Toys - Annotation"
 
 ## [0.5.1] - 2025-12-02
 
