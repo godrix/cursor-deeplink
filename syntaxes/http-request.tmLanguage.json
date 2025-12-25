@@ -1,0 +1,88 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "HTTP Request",
+  "patterns": [
+    {
+      "match": "^(##+)\\s+(.+)$",
+      "name": "markup.heading.http-request",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.heading.markdown"
+        },
+        "2": {
+          "name": "entity.name.section.http-request"
+        }
+      }
+    },
+    {
+      "begin": "^(curl)",
+      "end": "^(?=##|$)",
+      "name": "source.shell.http-request",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.other.curl"
+        }
+      },
+      "patterns": [
+        {
+          "match": "\\b(-[A-Za-z]|--[A-Za-z-]+)\\b",
+          "name": "entity.name.tag.curl.option"
+        },
+        {
+          "match": "\\b(-X|--request)\\s+(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\\b",
+          "name": "meta.http.method",
+          "captures": {
+            "1": {
+              "name": "entity.name.tag.curl.option"
+            },
+            "2": {
+              "name": "keyword.other.http.method"
+            }
+          }
+        },
+        {
+          "match": "\\b(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\\b",
+          "name": "keyword.other.http.method"
+        },
+        {
+          "match": "(https?://[^\\s'\"`]+|['\"`]https?://[^'\"`]+['\"`])",
+          "name": "string.quoted.url"
+        },
+        {
+          "match": "(-H|--header)\\s+(['\"`])([^'\"`]+)\\2",
+          "name": "meta.http.header",
+          "captures": {
+            "1": {
+              "name": "entity.name.tag.curl.option"
+            },
+            "3": {
+              "name": "string.quoted.http.header-value"
+            }
+          }
+        },
+        {
+          "match": "(-d|--data|--data-raw|--data-binary)\\s+(['\"`])([^'\"`]+)\\2",
+          "name": "meta.http.body",
+          "captures": {
+            "1": {
+              "name": "entity.name.tag.curl.option"
+            },
+            "3": {
+              "name": "string.quoted.http.body"
+            }
+          }
+        },
+        {
+          "match": "\\\\\\s*$",
+          "name": "punctuation.separator.continuation"
+        }
+      ]
+    }
+  ],
+  "scopeName": "text.http-request",
+  "fileTypes": [
+    "req",
+    "request"
+  ]
+}
+

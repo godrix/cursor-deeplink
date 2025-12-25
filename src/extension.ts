@@ -4,9 +4,12 @@ import { generateDeeplink } from './deeplinkGenerator';
 import { importDeeplink } from './deeplinkImporter';
 import { getFileTypeFromPath, isAllowedExtension, getUserHomePath, getCommandsPath, getCommandsFolderName, sanitizeFileName, getPersonalCommandsPaths } from './utils';
 import { DeeplinkCodeLensProvider } from './codelensProvider';
+import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { UserCommandsTreeProvider, CommandFileItem } from './userCommandsTreeProvider';
 import { sendToChat, sendSelectionToChat, buildPromptDeeplink, MAX_DEEPLINK_LENGTH } from './sendToChat';
 import { AnnotationPanel, AnnotationParams } from './annotationPanel';
+import { executeHttpRequestFromFile, getExecutionTime } from './httpRequestExecutor';
+import * as fs from 'fs';
 
 /**
  * Helper function to generate deeplink with validations
@@ -50,11 +53,73 @@ async function generateDeeplinkWithValidation(
 }
 
 export function activate(context: vscode.ExtensionContext) {
+  // Register HTTP Response Content Provider for custom tab titles
+  const httpResponseProvider = new (class implements vscode.TextDocumentContentProvider {
+    provideTextDocumentContent(uri: vscode.Uri): string {
+      // Extract the original file path from the custom scheme
+      // Format: http-response:///filename?originalPath=...&time=...
+      const queryParams = new URLSearchParams(uri.query);
+      const originalPath = queryParams.get('originalPath');
+      if (originalPath) {
+        try {
+          const originalUri = vscode.Uri.parse(originalPath);
+          return fs.readFileSync(originalUri.fsPath, 'utf8');
+        } catch (error) {
+          // If parsing fails, try to use the path directly
+          try {
+            return fs.readFileSync(originalPath, 'utf8');
+          } catch {
+            return '';
+          }
+        }
+      }
+      return '';
+    }
+  })();
+  
+  const httpResponseProviderDisposable = vscode.workspace.registerTextDocumentContentProvider(
+    'http-response',
+    httpResponseProvider
+  );
+
+  // Listen for tab changes to update titles with execution time
+  const updateTabTitles = () => {
+    const tabGroups = vscode.window.tabGroups.all;
+    for (const group of tabGroups) {
+      for (const tab of group.tabs) {
+        if (tab.input instanceof vscode.TabInputText) {
+          const uri = tab.input.uri;
+          const executionTime = getExecutionTime(uri);
+          if (executionTime && uri.scheme === 'file') {
+            // Check if it's a response file
+            const filePath = uri.fsPath;
+            if (filePath.endsWith('.res') || filePath.endsWith('.response')) {
+              // The tab label cannot be directly modified, but we can use the custom scheme
+              // The custom scheme URI will show the time in the path/query
+            }
+          }
+        }
+      }
+    }
+  };
+
+  // Update tab titles when tabs change
+  const tabChangeDisposable = vscode.window.tabGroups.onDidChangeTabs(() => {
+    updateTabTitles();
+  });
+
   // Register CodeLens Provider for all files
   const codeLensProvider = new DeeplinkCodeLensProvider();
   const codeLensDisposable = vscode.languages.registerCodeLensProvider(
     '*',
     codeLensProvider
+  );
+
+  // Register HTTP CodeLens Provider for HTTP request files
+  const httpCodeLensProvider = new HttpCodeLensProvider();
+  const httpCodeLensDisposable = vscode.languages.registerCodeLensProvider(
+    '*',
+    httpCodeLensProvider
   );
 
   // Generic command to generate deeplink (opens selector)
@@ -534,6 +599,27 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // Command to send HTTP request
+  const sendHttpRequestCommand = vscode.commands.registerCommand(
+    'cursor-commands-toys.sendHttpRequest',
+    async (uri?: vscode.Uri, startLine?: number, endLine?: number, sectionTitle?: string) => {
+      let requestUri: vscode.Uri;
+      
+      if (uri) {
+        requestUri = uri;
+      } else {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+          vscode.window.showErrorMessage('No file selected');
+          return;
+        }
+        requestUri = editor.document.uri;
+      }
+
+      await executeHttpRequestFromFile(requestUri, startLine, endLine, sectionTitle);
+    }
+  );
+
   // Register URI Handler for cursor://godrix.cursor-deeplink/* and vscode://godrix.cursor-deeplink/* deeplinks
   const uriHandler = vscode.window.registerUriHandler({
     handleUri(uri: vscode.Uri) {
@@ -605,7 +691,10 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   context.subscriptions.push(
+    httpResponseProviderDisposable,
+    tabChangeDisposable,
     codeLensDisposable,
+    httpCodeLensDisposable,
     generateCommand,
     generateCommandSpecific,
     generateRuleSpecific,
@@ -623,6 +712,7 @@ export function activate(context: vscode.ExtensionContext) {
     sendToChatCommand,
     sendSelectionToChatCommand,
     copySelectionAsPromptCommand,
+    sendHttpRequestCommand,
     uriHandler
   );
 }

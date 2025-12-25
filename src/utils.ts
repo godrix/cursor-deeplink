@@ -137,3 +137,37 @@ export function getPersonalCommandsPaths(): string[] {
   return paths;
 }
 
+/**
+ * Checks if a file is an HTTP request file (.req or .request) in .cursor/http/ folder
+ * @param filePath The file path to check
+ * @returns true if the file is an HTTP request file
+ */
+export function isHttpRequestFile(filePath: string): boolean {
+  const normalizedPath = filePath.replace(/\\/g, '/');
+  
+  // Check if file is in .cursor/http/ folder (with support for subfolders)
+  if (!normalizedPath.includes('/.cursor/http/')) {
+    return false;
+  }
+  
+  // Check if extension is .req or .request
+  const ext = getFileExtension(filePath).toLowerCase();
+  return ext === 'req' || ext === 'request';
+}
+
+/**
+ * Gets the response file path for a given request file path
+ * @param requestPath The path to the .req or .request file
+ * @returns The path to the corresponding .res or .response file
+ */
+export function getHttpResponsePath(requestPath: string): string {
+  const ext = getFileExtension(requestPath).toLowerCase();
+  const dir = path.dirname(requestPath);
+  const baseName = getFileNameWithoutExtension(requestPath);
+  
+  // Replace .req with .res or .request with .response
+  // .res naturally sorts after .req alphabetically
+  const responseExt = ext === 'req' ? 'res' : 'response';
+  return path.join(dir, `${baseName}.${responseExt}`);
+}
+

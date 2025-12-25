@@ -2,7 +2,7 @@
   "name": "cursor-deeplink",
   "displayName": "Cursor Commands Toys",
   "description": "Cursor Commands Toys - Your AI coding assistant toolkit. Generate and import deeplinks for Cursor commands, rules, and prompts files, send code to chat, and more",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "publisher": "godrix",
   "icon": "resources/icon.png",
   "author": {
@@ -44,7 +44,8 @@
     "onView:cursor-deeplink.userCommands",
     "onCommand:cursor-commands-toys.sendToChat",
     "onCommand:cursor-commands-toys.sendSelectionToChat",
-    "onCommand:cursor-commands-toys.copySelectionAsPrompt"
+    "onCommand:cursor-commands-toys.copySelectionAsPrompt",
+    "onCommand:cursor-commands-toys.sendHttpRequest"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -113,6 +114,11 @@
         "command": "cursor-commands-toys.copySelectionAsPrompt",
         "title": "Copy as Prompt Deeplink",
         "icon": "$(copy)"
+      },
+      {
+        "command": "cursor-commands-toys.sendHttpRequest",
+        "title": "Send HTTP Request",
+        "icon": "$(send)"
       }
     ],
     "submenus": [
@@ -283,9 +289,55 @@
           ],
           "default": "both",
           "description": "Which command folders to show in Personal Commands view: 'both' for .cursor and .claude, 'cursor' for .cursor only, or 'claude' for .claude only"
+        },
+        "cursorDeeplink.httpRequestTimeout": {
+          "type": "number",
+          "default": 10,
+          "description": "Timeout in seconds for HTTP requests (default: 10 seconds)"
+        },
+        "cursorDeeplink.httpRequestSaveFile": {
+          "type": "boolean",
+          "default": false,
+          "description": "Save HTTP response to file. If false, only shows preview without saving."
         }
       }
     },
+    "languages": [
+      {
+        "id": "http-request",
+        "aliases": [
+          "HTTP Request",
+          "http-request"
+        ],
+        "extensions": [
+          ".req",
+          ".request"
+        ]
+      },
+      {
+        "id": "http-response",
+        "aliases": [
+          "HTTP Response",
+          "http-response"
+        ],
+        "extensions": [
+          ".res",
+          ".response"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "http-request",
+        "scopeName": "text.http-request",
+        "path": "./syntaxes/http-request.tmLanguage.json"
+      },
+      {
+        "language": "http-response",
+        "scopeName": "text.http-response",
+        "path": "./syntaxes/http-response.tmLanguage.json"
+      }
+    ],
     "keybindings": [
       {
         "command": "cursor-commands-toys.import",
