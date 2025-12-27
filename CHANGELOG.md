@@ -2,6 +2,67 @@
 
 All notable changes to the "Cursor Toys" extension will be documented in this file.
 
+## [0.9.0] - 2025-12-27
+
+### Added
+- **Personal Prompts Support**: Complete functionality to manage personal prompts in `~/.cursor/prompts/`, mirroring the Personal Commands system
+  - New "Personal Prompts" view in Explorer sidebar to browse and manage prompts from `~/.cursor/prompts/`
+  - Import prompts via deeplink with option to save as Personal (default) or Project prompt
+  - Personal prompts are available across all projects
+  - Project prompts remain workspace-specific in `workspace/.cursor/prompts/`
+- **Save as User Prompt**: New command to copy prompts from workspace to personal prompts folder
+  - Available via context menu for files in `.cursor/prompts/`
+  - Asks for confirmation before overwriting existing files
+  - Option to remove original file after copying
+  - Automatically opens the saved file
+- **Personal Prompts Management Commands**: Full set of management commands for personal prompts
+  - Open prompt file
+  - Generate deeplink for prompt
+  - Rename prompt
+  - Delete prompt
+  - Reveal prompt in file system
+  - Refresh tree view
+- **Personal Prompts Tree View Features**:
+  - Hierarchical folder structure support
+  - Drag and drop functionality between folders
+  - Alphabetical sorting of folders and files
+  - Automatic tree refresh on file changes
+  - Context menu with all management options
+
+### Changed
+- **Deeplink Import Flow for Prompts**: When importing a prompt deeplink, user is now asked if they want to save as Personal (default) or Project prompt
+  - Personal prompts saved to `~/.cursor/prompts/`
+  - Project prompts saved to `workspace/.cursor/prompts/`
+  - Maintains consistency with command import behavior
+- **File Type Detection**: Updated `getFileTypeFromPath()` to properly detect prompts in both workspace and user home directory
+
+### Technical Details
+- **New Files**:
+  - `src/userPromptsTreeProvider.ts`: Complete tree provider for personal prompts with drag-and-drop support
+- **Enhanced Files**:
+  - `src/utils.ts`: Added `getPromptsPath()` and `getPersonalPromptsPaths()` utility functions
+  - `src/deeplinkImporter.ts`: Updated import logic to support personal prompts with user choice
+  - `src/extension.ts`: Added all prompt management commands, tree view, and file watchers
+  - `package.json`: Added personal prompts view, commands, menus, and activation events
+- **New Commands**:
+  - `cursor-commands-toys.save-as-user-prompt`: Save workspace prompt as personal prompt
+  - `cursor-commands-toys.openUserPrompt`: Open personal prompt file
+  - `cursor-commands-toys.generateUserPromptDeeplink`: Generate deeplink for personal prompt
+  - `cursor-commands-toys.deleteUserPrompt`: Delete personal prompt
+  - `cursor-commands-toys.revealUserPrompt`: Reveal personal prompt in file system
+  - `cursor-commands-toys.renameUserPrompt`: Rename personal prompt
+  - `cursor-commands-toys.refreshUserPrompts`: Refresh personal prompts tree view
+- **New View**:
+  - `cursor-deeplink.userPrompts`: Personal Prompts tree view in Explorer sidebar
+- **File System Watchers**: Added automatic monitoring of `~/.cursor/prompts/` for real-time updates
+
+### Architecture
+- Personal prompts follow the same architecture as Personal Commands
+- Prompts always use `.cursor` folder (not `.claude`)
+- Respects `allowedExtensions` configuration
+- Automatic directory creation when needed
+- Cross-platform compatibility (Windows, Mac, Linux)
+
 ## [0.8.4] - 2025-12-25
 
 ### Added
