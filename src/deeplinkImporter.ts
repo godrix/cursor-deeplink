@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { decodeUrlParam, sanitizeFileName, getUserHomePath, getCommandsPath } from './utils';
+import { decodeUrlParam, sanitizeFileName, getUserHomePath, getCommandsPath, getPromptsPath } from './utils';
 
 interface DeeplinkParams {
   type: 'prompt' | 'command' | 'rule';
@@ -20,37 +20,38 @@ export async function importDeeplink(url: string): Promise<void> {
       return;
     }
 
-    // For commands, ask if user wants to save as Project or Personal command
-    let isPersonalCommand = false;
-    if (params.type === 'command') {
-      const commandLocation = await vscode.window.showQuickPick(
+    // For commands and prompts, ask if user wants to save as Project or Personal
+    let isPersonal = false;
+    if (params.type === 'command' || params.type === 'prompt') {
+      const itemType = params.type === 'command' ? 'command' : 'prompt';
+      const itemLocation = await vscode.window.showQuickPick(
         [
-          { label: 'Project commands', description: 'Specific to this workspace', value: false },
-          { label: 'Personal commands', description: 'Available in all projects (~/.cursor/commands)', value: true }
+          { label: `Personal ${itemType}s`, description: `Available in all projects (~/.cursor/${itemType}s)`, value: true },
+          { label: `Project ${itemType}s`, description: 'Specific to this workspace', value: false }
         ],
         {
-          placeHolder: 'Where do you want to save this command?'
+          placeHolder: `Where do you want to save this ${itemType}?`
         }
       );
 
-      if (commandLocation === undefined) {
+      if (itemLocation === undefined) {
         // User cancelled
         return;
       }
 
-      isPersonalCommand = commandLocation.value;
+      isPersonal = itemLocation.value;
     }
 
     // Get workspace folder (only needed for project commands, rules, and prompts)
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    if (!workspaceFolder && !isPersonalCommand) {
+    if (!workspaceFolder && !isPersonal) {
       vscode.window.showErrorMessage('No workspace open');
       return;
     }
 
     // Determine destination folder and file name
     const workspacePath = workspaceFolder?.uri.fsPath || '';
-    const { folderPath, fileName } = getDestinationPath(params, workspacePath, isPersonalCommand);
+    const { folderPath, fileName } = getDestinationPath(params, workspacePath, isPersonal);
 
     // Check if file already exists
     const fileUri = vscode.Uri.file(path.join(folderPath, fileName));
@@ -193,7 +194,7 @@ function parseDeeplinkUrl(url: string): DeeplinkParams | null {
 function getDestinationPath(
   params: DeeplinkParams,
   workspacePath: string,
-  isPersonalCommand: boolean = false
+  isPersonal: boolean = false
 ): { folderPath: string; fileName: string } {
   // Get allowed extensions configuration
   const config = vscode.workspace.getConfiguration('cursorDeeplink');
@@ -206,7 +207,7 @@ function getDestinationPath(
   switch (params.type) {
     case 'command':
       // Use configuration to determine the commands folder path
-      folderPath = getCommandsPath(workspacePath, isPersonalCommand);
+      folderPath = getCommandsPath(workspacePath, isPersonal);
       fileName = params.name ? `${sanitizeFileName(params.name)}.${defaultExtension}` : `command.${defaultExtension}`;
       break;
     case 'rule':
@@ -216,7 +217,8 @@ function getDestinationPath(
       fileName = params.name ? `${sanitizeFileName(params.name)}.${ruleExtension}` : `rule.${ruleExtension}`;
       break;
     case 'prompt':
-      folderPath = path.join(workspacePath, '.cursor', 'prompts');
+      // Use new getPromptsPath function to determine prompts folder path
+      folderPath = getPromptsPath(workspacePath, isPersonal);
       // For prompts, if no name, use a default name based on content
       if (params.name) {
         fileName = `${sanitizeFileName(params.name)}.${defaultExtension}`;

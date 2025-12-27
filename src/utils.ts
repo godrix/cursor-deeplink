@@ -32,6 +32,7 @@ export function getFileTypeFromPath(filePath: string): 'command' | 'rule' | 'pro
   if (normalizedPath.includes('/.cursor/rules/')) {
     return 'rule';
   }
+  // Prompts can be in workspace or user home directory
   if (normalizedPath.includes('/.cursor/prompts/')) {
     return 'prompt';
   }
@@ -133,6 +134,33 @@ export function getPersonalCommandsPaths(): string[] {
   if (viewMode === 'both' || viewMode === 'claude') {
     paths.push(path.join(homePath, '.claude', 'commands'));
   }
+  
+  return paths;
+}
+
+/**
+ * Gets the full path to the prompts folder
+ * @param workspacePath Optional workspace path (if not provided, returns user home path)
+ * @param isUser If true, returns path in user home directory; if false, returns workspace path
+ */
+export function getPromptsPath(workspacePath?: string, isUser: boolean = false): string {
+  if (isUser || !workspacePath) {
+    return path.join(getUserHomePath(), '.cursor', 'prompts');
+  }
+  
+  return path.join(workspacePath, '.cursor', 'prompts');
+}
+
+/**
+ * Gets the paths to the prompt folders to show in Personal Prompts view
+ * @returns Array of folder paths (currently only .cursor/prompts)
+ */
+export function getPersonalPromptsPaths(): string[] {
+  const homePath = getUserHomePath();
+  const paths: string[] = [];
+  
+  // For now, only support .cursor/prompts (not .claude)
+  paths.push(path.join(homePath, '.cursor', 'prompts'));
   
   return paths;
 }
