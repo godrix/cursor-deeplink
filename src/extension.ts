@@ -54,6 +54,28 @@ async function generateDeeplinkWithValidation(
 }
 
 export function activate(context: vscode.ExtensionContext) {
+  // Show deprecation notice (only once)
+  const deprecationKey = 'cursor-deeplink.deprecation-notice-shown-v1';
+  const hasShownNotice = context.globalState.get<boolean>(deprecationKey, false);
+  
+  if (!hasShownNotice) {
+    vscode.window.showWarningMessage(
+      '⚠️ cursor-deeplink is deprecated. Please install "CursorToys" for continued updates and new features.',
+      'Install CursorToys',
+      'Learn More',
+      'Dismiss'
+    ).then(selection => {
+      if (selection === 'Install CursorToys') {
+        vscode.env.openExternal(vscode.Uri.parse('vscode:extension/godrix.cursor-toys'));
+      } else if (selection === 'Learn More') {
+        vscode.env.openExternal(vscode.Uri.parse('https://github.com/godrix/cursor-toys#readme'));
+      }
+      
+      // Mark as shown regardless of user choice
+      context.globalState.update(deprecationKey, true);
+    });
+  }
+
   // Register HTTP Response Content Provider for custom tab titles
   const httpResponseProvider = new (class implements vscode.TextDocumentContentProvider {
     provideTextDocumentContent(uri: vscode.Uri): string {

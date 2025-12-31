@@ -1,8 +1,8 @@
 {
   "name": "cursor-deeplink",
-  "displayName": "Cursor Commands Toys",
-  "description": "Cursor Commands Toys - Your AI coding assistant toolkit. Generate and import deeplinks for Cursor commands, rules, and prompts files, send code to chat, and more",
-  "version": "0.9.0",
+  "displayName": "[DEPRECATED] Cursor Commands Toys - Use CursorToys",
+  "description": "⚠️ DEPRECATED: This extension is no longer maintained. Please migrate to CursorToys (godrix.cursor-toys) for continued updates and new features.",
+  "version": "0.9.1",
   "publisher": "godrix",
   "icon": "resources/icon.png",
   "author": {
@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/godrix/cursor-deeplink#readme",
   "keywords": [
+    "deprecated",
+    "use-cursor-toys-instead",
     "cursor",
     "deeplink",
     "commands",

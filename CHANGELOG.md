@@ -2,6 +2,36 @@
 
 All notable changes to the "Cursor Toys" extension will be documented in this file.
 
+## [0.9.1] - 2025-12-31
+
+### Deprecated
+- **Extension Deprecated**: This extension (`cursor-deeplink`) has been deprecated and replaced by **CursorToys** (`godrix.cursor-toys`)
+- **No Future Updates**: This extension will no longer receive updates, bug fixes, or new features
+- **Migration Notice**: Added deprecation warning that shows once when extension activates
+  - Provides options to install CursorToys or learn more
+  - Links to CursorToys marketplace page and documentation
+- **Documentation Updates**:
+  - Added prominent deprecation banner to README.md
+  - Created comprehensive MIGRATION.md guide
+  - Added migration guide section to README.md
+  - Updated package.json with [DEPRECATED] prefix in display name
+  - Added deprecation keywords to package.json
+
+### Migration
+Users should migrate to **CursorToys** (`godrix.cursor-toys`) for continued support:
+- 📦 Install from: https://marketplace.visualstudio.com/items?itemName=Godrix.cursor-toys
+- 📚 Documentation: https://github.com/godrix/cursor-toys#readme
+- 📝 Migration Guide: See MIGRATION.md in this repository
+
+### Why Migrate?
+CursorToys includes all cursor-deeplink functionality plus:
+- 🚀 In-editor API Testing with environment variables
+- 🗜️ File & Clipboard Minification (JSON, HTML, CSS, JS, TS)
+- 📚 Enhanced Personal Command Libraries
+- 🌍 Dynamic HTTP request configurations
+- 💬 Better Chat Integration
+- ✨ Active development and new features
+
 ## [0.9.0] - 2025-12-27
 
 ### Added

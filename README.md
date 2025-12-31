@@ -1,3 +1,27 @@
+> ## ⚠️ DEPRECATION NOTICE
+> 
+> **This extension has been deprecated and replaced by [CursorToys](https://marketplace.visualstudio.com/items?itemName=Godrix.cursor-toys).**
+> 
+> ### Please migrate to the new extension:
+> - 📦 [Install from VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Godrix.cursor-toys)
+> - 📦 [Install from Open VSX](https://open-vsx.org/extension/godrix/cursor-toys)
+> - 📚 [View Documentation](https://github.com/godrix/cursor-toys#readme)
+> 
+> ### Why migrate?
+> CursorToys includes all functionality from cursor-deeplink plus:
+> - 🚀 **In-editor API Testing** — Test APIs without leaving your editor
+> - 🗜️ **File & Clipboard Minification** — Optimize JSON, HTML, CSS, JS instantly
+> - 📚 **Personal Command Libraries** — Reusable commands across all projects
+> - 🌍 **Environment Variables** — Dynamic HTTP request configurations
+> - 💬 **Enhanced Chat Integration** — Better workflow with Cursor AI
+> - And much more!
+> 
+> **This extension will no longer receive updates, bug fixes, or new features.**
+> 
+> [See Migration Guide](#migration-guide)
+
+---
+
 # Cursor Command Toys 🚀 Supercharge Your Cursor Development Experience
 
 A powerful VS Code/Cursor extension that **enhances your development workflow** by making Cursor's AI capabilities more accessible, shareable, and efficient. Transform your coding experience with seamless command management, instant HTTP request testing, and effortless team collaboration.
@@ -508,3 +532,48 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Made with ❤️ for the Cursor community**
+
+---
+
+## Migration Guide
+
+### Step 1: Install CursorToys
+
+**Option A: VS Code Marketplace**
+1. Open Extensions panel (`Cmd+Shift+X` / `Ctrl+Shift+X`)
+2. Search for "CursorToys"
+3. Click Install
+
+**Option B: Direct Links**
+- [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Godrix.cursor-toys)
+- [Open VSX Registry](https://open-vsx.org/extension/godrix/cursor-toys)
+
+### Step 2: Uninstall cursor-deeplink (Optional)
+
+While both extensions can coexist, we recommend uninstalling cursor-deeplink after confirming CursorToys works for your needs.
+
+### Step 3: Update Your Workflow
+
+All commands have been renamed with the `cursor-toys` prefix:
+
+| Old Command (cursor-deeplink) | New Command (CursorToys) |
+|-------------------------------|--------------------------|
+| `cursor-commands-toys.generate` | `cursor-toys.generate` |
+| `cursor-commands-toys.import` | `cursor-toys.import` |
+| `cursor-commands-toys.generate-command` | `cursor-toys.generate-command` |
+| `cursor-commands-toys.generate-rule` | `cursor-toys.generate-rule` |
+| `cursor-commands-toys.generate-prompt` | `cursor-toys.generate-prompt` |
+
+Keyboard shortcuts remain the same (`Cmd+Shift+I` / `Ctrl+Shift+I` for import).
+
+### Your Settings and Data
+
+- All your existing `.cursor/commands/`, `.cursor/rules/`, and `.cursor/prompts/` files will work with CursorToys immediately
+- CursorToys uses the same folder structure, so no migration needed
+- Configure CursorToys via Settings > CursorToys
+
+### Need Help?
+
+- [Report Issues](https://github.com/godrix/cursor-toys/issues)
+- [Full Documentation](https://github.com/godrix/cursor-toys#readme)
+- [Feature Requests](https://github.com/godrix/cursor-toys/issues/new)
